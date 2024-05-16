@@ -26,7 +26,7 @@ int main() {
     }
 
     std::vector<Event> events;
-   
+
     double total_service_time = 0.0;
     double total_waiting_time = 0.0;
     double last_departure_time = 0.0;
