@@ -59,8 +59,8 @@ int main() {
         
         // Calculate waiting time for this event
         double wait_time = (event.service_start - event.clock_time);
+        total_waiting_time += wait_time;
         if (wait_time > 0) {
-            total_waiting_time += wait_time;
             total_customers_who_waited++;
         }
         event.waiting_time = wait_time;
@@ -110,7 +110,6 @@ int main() {
         << std::endl;
 
     double total_time_in_system = 0.0;
-    double total_simulation_time = last_departure_time;
     double total_idle_time = 0.0;
 
     // Output table rows
@@ -132,8 +131,11 @@ int main() {
         total_idle_time += event.idle_time;
     }
 
+    // Calculate the total simulation time
+    double total_simulation_time = last_departure_time;
+
     // Output average and probability metrics
-    std::cout << "\nAverage Waiting Time in Queue: " << total_waiting_time / total_customers_who_waited << std::endl;
+    std::cout << "\nAverage Waiting Time in Queue: " << (total_customers_who_waited > 0 ? total_waiting_time / total_customers_who_waited : 0) << std::endl;
     std::cout << "Probability a Customer Waits: " << double(total_customers_who_waited) / total_customers << std::endl;
     std::cout << "Proportion of Idle Time: " << total_idle_time / total_simulation_time << std::endl;
     std::cout << "Proportion of Busy Time: " << total_service_time / total_simulation_time << std::endl;
