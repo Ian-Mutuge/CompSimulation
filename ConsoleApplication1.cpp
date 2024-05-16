@@ -143,5 +143,14 @@ int main() {
     std::cout << "\nAverage waiting time: " << avg_waiting_time << std::endl;
     std::cout << "Average service time: " << avg_service_time << std::endl;
 
+    // Output average and probability metrics
+    std::cout << "\nAverage Waiting Time in Queue: " << total_waiting_time / total_customers_who_waited << std::endl;
+    std::cout << "Probability a Customer Waits: " << double(total_customers_who_waited) / total_customers << std::endl;
+    std::cout << "Proportion of Idle Time: " << total_idle_time / last_departure_time << std::endl;
+    std::cout << "Proportion of Busy Time: " << total_service_time / last_departure_time << std::endl;
+    std::cout << "Average Service Time: " << total_service_time / total_customers << std::endl;
+    std::cout << "Average Waiting Time: " << total_waiting_time / total_customers << std::endl;
+    std::cout << "Average Time in System: " << total_time_in_system / total_customers << std::endl;
+
     return 0;
 }
