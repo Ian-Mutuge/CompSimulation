@@ -26,13 +26,16 @@ int main() {
     }
 
     std::vector<Event> events;
-   
+
     double total_service_time = 0.0;
     double total_waiting_time = 0.0;
     double last_departure_time = 0.0;
     double interarrival_time, service_time;
     int customer_no = 1; // Counter for customer number
     double prev_clock_time = 0.0; // Initialize previous clock time
+    int total_customers_who_waited = 0;
+    int total_customers = 0;
+
     while (infile >> interarrival_time >> service_time) {
         Event event;
         event.customer_no = customer_no++;
@@ -40,12 +43,9 @@ int main() {
         event.service_time = service_time;
         event.clock_time = prev_clock_time + event.interarrival_time; // Set event's clock time
 
-
         // Update service start and end times
         event.service_start = std::max(event.clock_time, last_departure_time);
         event.service_end = event.service_start + service_time;
-
-
 
         // Update queue and service times
         int no_in_queue = 0;
@@ -56,12 +56,16 @@ int main() {
         }
         event.no_in_queue = no_in_queue;
         event.no_in_system = event.no_in_queue + 1;
+        
         // Calculate waiting time for this event
         double wait_time = (event.service_start - event.clock_time);
         total_waiting_time += wait_time;
+        if (wait_time > 0) {
+            total_customers_who_waited++;
+        }
         event.waiting_time = wait_time;
 
-       // Calculate idle time
+        // Calculate idle time
         double idle_time = event.clock_time - last_departure_time;
         event.idle_time = std::max(0.0, idle_time); // Ensure idle time is non-negative
 
@@ -79,6 +83,8 @@ int main() {
 
         // Update previous clock time for the next event
         prev_clock_time = event.clock_time;
+
+        total_customers++;
     }
 
     infile.close();
@@ -104,22 +110,10 @@ int main() {
         << std::endl;
 
     double total_time_in_system = 0.0;
-    double total_simulation_time = last_departure_time;
-    double total_idle_time = total_simulation_time - total_service_time;
-    
-   
-    int no_in_system = 0;
-    // Output table rows
-    // Output table rows
-    // Output table rows
-    // Output table rows
-    // Output table rows
-// Output table rows
-    for (size_t i = 0; i < events.size(); ++i) {
-        const auto& event = events[i];
+    double total_idle_time = 0.0;
 
-
-        // Output event details
+    // Output table rows
+    for (const auto& event : events) {
         std::cout << std::setw(12) << event.customer_no
             << std::setw(12) << event.interarrival_time
             << std::setw(12) << event.clock_time
@@ -133,21 +127,18 @@ int main() {
             << std::setw(12) << event.idle_time
             << std::endl;
 
-        total_idle_time += event.interarrival_time - event.clock_time;
         total_time_in_system += event.time_in_system;
+        total_idle_time += event.idle_time;
     }
 
-
-
-    // Output average waiting time and average service time
-    std::cout << "\nAverage waiting time: " << avg_waiting_time << std::endl;
-    std::cout << "Average service time: " << avg_service_time << std::endl;
+    // Calculate the total simulation time
+    double total_simulation_time = last_departure_time;
 
     // Output average and probability metrics
-    std::cout << "\nAverage Waiting Time in Queue: " << total_waiting_time / total_customers_who_waited << std::endl;
+    std::cout << "\nAverage Waiting Time in Queue: " << (total_customers_who_waited > 0 ? total_waiting_time / total_customers_who_waited : 0) << std::endl;
     std::cout << "Probability a Customer Waits: " << double(total_customers_who_waited) / total_customers << std::endl;
-    std::cout << "Proportion of Idle Time: " << total_idle_time / last_departure_time << std::endl;
-    std::cout << "Proportion of Busy Time: " << total_service_time / last_departure_time << std::endl;
+    std::cout << "Proportion of Idle Time: " << total_idle_time / total_simulation_time << std::endl;
+    std::cout << "Proportion of Busy Time: " << total_service_time / total_simulation_time << std::endl;
     std::cout << "Average Service Time: " << total_service_time / total_customers << std::endl;
     std::cout << "Average Waiting Time: " << total_waiting_time / total_customers << std::endl;
     std::cout << "Average Time in System: " << total_time_in_system / total_customers << std::endl;
